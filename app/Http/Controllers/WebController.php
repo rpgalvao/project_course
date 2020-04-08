@@ -29,15 +29,28 @@ class WebController extends Controller
 
     public function blog()
     {
+        $posts = Post::orderBy('created_at', 'DESC')->get();
+
         $head = $this->seo->render(env('APP_NAME') . ' - Artigos do nosso blog', 'Leia artigos interessantes sobre tecnologia', route('blog'), asset('images/project-1.jpg'));
         return view('front.blog', [
-            'head' => $head
+            'head' => $head,
+            'posts' => $posts
         ]);
     }
 
-    public function article()
+    public function article($uri)
     {
-        return view('front.article');
+        $post = Post::where('uri', $uri)->first();
+
+        $head = $this->seo->render(env('APP_NAME') . ' - ' . $post->title,
+                    $post->subtitle,
+                    route('article', $post->uri),
+                    \Illuminate\Support\Facades\Storage::url(\App\Support\Cropper::thumb($post->cover, 1200, 628)));
+
+        return view('front.article', [
+            'head' => $head,
+            'post' => $post
+        ]);
     }
 
     public function contact()

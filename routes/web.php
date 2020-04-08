@@ -14,5 +14,5 @@
 Route::get('/', 'WebController@home')->name('home');
 Route::get('/cursos', 'WebController@course')->name('course');
 Route::get('/blog', 'WebController@blog')->name('blog');
-Route::get('/blog/{title}', 'WebController@article')->name('article');
+Route::get('/blog/{uri}', 'WebController@article')->name('article');
 Route::get('/contato', 'WebController@contact')->name('contact');
