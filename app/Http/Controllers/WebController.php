@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\Contact;
 use App\Post;
 use App\Support\Seo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class WebController extends Controller
 {
@@ -43,9 +45,9 @@ class WebController extends Controller
         $post = Post::where('uri', $uri)->first();
 
         $head = $this->seo->render(env('APP_NAME') . ' - ' . $post->title,
-                    $post->subtitle,
-                    route('article', $post->uri),
-                    \Illuminate\Support\Facades\Storage::url(\App\Support\Cropper::thumb($post->cover, 1200, 628)));
+            $post->subtitle,
+            route('article', $post->uri),
+            \Illuminate\Support\Facades\Storage::url(\App\Support\Cropper::thumb($post->cover, 1200, 628)));
 
         return view('front.article', [
             'head' => $head,
@@ -59,5 +61,24 @@ class WebController extends Controller
         return view('front.contact', [
             'head' => $head
         ]);
+    }
+
+    public function sendMail(Request $request)
+    {
+        $data = [
+            'reply_name' => $request->first_name . " " . $request->last_name,
+            'reply_email' => $request->email,
+            'subject' => $request->subject,
+            'message' => $request->message
+        ];
+
+        Mail::send(new Contact($data));
+
+        session()->flash('success', 'E-mail enviado com sucesso!');
+
+        return redirect()->route('contact');
+
+//        return new Contact($data);
+//        var_dump($request->all());
     }
 }
